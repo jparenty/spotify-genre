@@ -1,0 +1,259 @@
+,genre,size
+0,rock,564
+1,permanent wave,363
+2,alternative rock,359
+3,modern rock,297
+4,indietronica,172
+5,french indie pop,158
+6,classic rock,142
+7,indie rock,126
+8,french indietronica,121
+9,electronica,119
+10,art pop,118
+11,melancholia,111
+12,art rock,111
+13,garage rock,110
+14,french hip hop,99
+15,album rock,96
+16,chamber pop,90
+17,singer-songwriter,88
+18,alternative dance,87
+19,pop,87
+20,neo-synthpop,81
+21,french rock,81
+22,new rave,80
+23,oxford indie,75
+24,nouvelle chanson francaise,72
+25,french pop,66
+26,new wave,63
+27,rap conscient,60
+28,pov: indie,56
+29,chanson,55
+30,dance rock,54
+31,new romantic,54
+32,soul,53
+33,hard rock,51
+34,folk rock,50
+35,hip hop,48
+36,rap,48
+37,psychedelic rock,47
+38,downtempo,47
+39,filter house,46
+40,new wave pop,45
+41,sheffield indie,45
+42,dance-punk,44
+43,alternative hip hop,43
+44,dance pop,43
+45,trip hop,42
+46,soft rock,41
+47,rock-and-roll,40
+48,mellow gold,40
+49,glam rock,37
+50,belgian hip hop,37
+51,rockabilly,36
+52,modern alternative rock,36
+53,folk,36
+54,grunge,35
+55,british invasion,34
+56,alternative metal,33
+57,synthpop,33
+58,piano rock,33
+59,french synthpop,32
+60,lilith,32
+61,funk rock,32
+62,boston rock,31
+63,electrofox,31
+64,indie soul,31
+65,pop rap,30
+66,classic soul,30
+67,funk metal,30
+68,baroque pop,29
+69,socal pop punk,27
+70,swedish electropop,26
+71,classical,26
+72,pop rock,25
+73,belgian pop,25
+74,neo soul,24
+75,funk,24
+76,rock independant francais,23
+77,belgian indie,23
+78,electro-pop francais,22
+79,noise pop,22
+80,neo-psychedelic,22
+81,protopunk,21
+82,vocal jazz,20
+83,uk post-punk,20
+84,quiet storm,20
+85,britpop,20
+86,edm,19
+87,shimmer pop,19
+88,italian adult pop,19
+89,electronic rock,18
+90,italian pop,18
+91,punk,18
+92,italian indie pop,18
+93,progressive rock,18
+94,symphonic rock,18
+95,classic italian pop,17
+96,madchester,17
+97,latin afrobeat,16
+98,modern blues rock,16
+99,british indie rock,16
+100,shoegaze,16
+101,post-punk,16
+102,british folk,16
+103,post-grunge,16
+104,neo mellow,16
+105,classical piano,15
+106,old school rap francais,15
+107,italian alternative,15
+108,orchestra,15
+109,pop dance,15
+110,gothenburg indie,15
+111,swedish synthpop,15
+112,israeli indie,15
+113,motown,14
+114,soundtrack,14
+115,scottish rock,14
+116,anti-folk,13
+117,country rock,13
+118,glitch pop,13
+119,nu metal,13
+120,indie poptimism,13
+121,blues rock,12
+122,punk blues,12
+123,mpb,12
+124,belgian rock,12
+125,europop,12
+126,soul jazz,12
+127,roots rock,12
+128,electro house,11
+129,sophisti-pop,11
+130,late romantic era,11
+131,lo-fi,11
+132,metropopolis,11
+133,british soul,11
+134,electropop,11
+135,southern soul,11
+136,compositional ambient,10
+137,folk rock italiano,10
+138,indie pop,10
+139,orchestral soundtrack,10
+140,jazz blues,10
+141,orchestral performance,10
+142,east coast hip hop,10
+143,jazz trumpet,10
+144,solo wave,10
+145,zolo,9
+146,canadian pop,9
+147,gangster rap,9
+148,lgbtq+ hip hop,9
+149,r&b,9
+150,disco,9
+151,acid rock,9
+152,classical performance,9
+153,early romantic era,9
+154,world,9
+155,rap calme,8
+156,crank wave,8
+157,art punk,8
+158,classical era,8
+159,german dance,8
+160,rap metal,8
+161,bubblegum pop,8
+162,australian pop,8
+163,beatlesque,8
+164,new french touch,8
+165,adult standards,8
+166,experimental rock,8
+167,australian dance,8
+168,jazz funk,7
+169,french indie folk,7
+170,symfonicky orchestr,7
+171,dream pop,7
+172,variete francaise,7
+173,bossa nova,7
+174,psychedelic soul,7
+175,west coast rap,7
+176,memphis soul,7
+177,escape room,6
+178,american folk revival,6
+179,pop urbaine,6
+180,chamber psych,6
+181,uk alternative pop,6
+182,garage rock revival,6
+183,jazz,6
+184,urban contemporary,6
+185,irish rock,6
+186,hip pop,6
+187,experimental,6
+188,minimalism,6
+189,afropop,6
+190,r&b francais,6
+191,no wave,6
+192,la indie,6
+193,abstract hip hop,6
+194,uk hip hop,6
+195,australian rock,5
+196,heartland rock,5
+197,chillwave,5
+198,tropicalia,5
+199,chicago rap,5
+200,canadian singer-songwriter,5
+201,g funk,5
+202,lounge,5
+203,detroit hip hop,5
+204,afrobeat,5
+205,rome indie,5
+206,hardcore hip hop,5
+207,conscious hip hop,5
+208,canadian contemporary r&b,5
+209,german romanticism,5
+210,soul blues,5
+211,jazz rap,5
+212,afrobeats,5
+213,instrumental funk,4
+214,house,4
+215,queens hip hop,4
+216,funk pop,4
+217,nova mpb,4
+218,classic canadian rock,4
+219,canzone d'autore,4
+220,atl hip hop,4
+221,alternative r&b,4
+222,dancehall,4
+223,brooklyn indie,4
+224,ye ye,4
+225,funk rj,4
+226,pop nacional,4
+227,pagode baiano,4
+228,girl group,4
+229,minimal techno,4
+230,ectofolk,4
+231,miami hip hop,4
+232,trap,4
+233,slowcore,4
+234,dutch pop,4
+235,yacht rock,4
+236,french soundtrack,3
+237,rap belge,3
+238,rap inde,3
+239,vintage french electronic,3
+240,british orchestra,3
+241,nu jazz,3
+242,talent show,3
+243,nigerian pop,3
+244,deep euro house,3
+245,microhouse,3
+246,french techno,3
+247,welsh rock,3
+248,supergroup,3
+249,big beat,3
+250,hip-hop experimental,3
+251,eurodance,3
+252,reggae fusion,3
+253,post-disco,3
+254,french reggae,3
+255,swedish singer-songwriter,3
+256,austrian orchestra,3
+257,ecm-style jazz,3
