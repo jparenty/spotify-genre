@@ -3,7 +3,7 @@ import click
 
 from .spotify import SpotifyApi
 
-CACHE_PATH = "../../cache"
+from .definitions import CACHE_PATH
 
 class User:
 
@@ -14,17 +14,31 @@ class User:
 
     @staticmethod
     def get_user(user_name):
-        breakpoint()
         try:
             with open(f"{CACHE_PATH}/{user_name}/user.json") as f:
                 user = json.load(f)
+                breakpoint()
                 user = User(
                     user_name = user["user_name"],
-                    spotify_id = user["spotify_id"],
+                    spotify_id = user["spotify_id"]
                 )
+                user.spotify_id = user.spotify_id[0]
+                breakpoint()
+            
         except FileNotFoundError:
             user = None
         except Exception as e:
-            print(f"An error occurred: {e}")
-
+            return e
+        
         return user
+
+    def get_last_song(self):
+        try:
+            with open(f"{CACHE_PATH}/{self.user_name}/genre_clean_songs.json") as f:
+                songs = json.load(f)
+                last_song = songs[songs.keys[0]]
+                breakpoint()
+        except FileNotFoundError:
+            return f"No saved songs for {self.user_name}"
+        except Exception as e:
+            return e

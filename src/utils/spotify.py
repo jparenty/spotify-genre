@@ -6,13 +6,13 @@ import json
 import os
 import click
 
-CACHE_PATH = "../../cache"
+from .definitions import CACHE_PATH
 
 class SpotifyApi():
     
     def __init__(self, user_name) -> None:
         def auth_02(user_name):
-            scope = 'user-library-read playlist-modify-private playlist-read-private playlist-modify-private'
+            scope = 'user-library-read playlist-modify-private playlist-read-private playlist-modify-public'
             sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope, show_dialog = True, username=user_name))
             return sp
         
@@ -21,6 +21,7 @@ class SpotifyApi():
         self.last_request = time.time()
         self.user_name = user_name
         self.sp = auth_02(self.user_name)
+        click.secho("Authentification successfull", fg="green")
         print(self.sp.current_user())
 
     def __check_count(self):
@@ -34,7 +35,7 @@ class SpotifyApi():
         
         else:
             self.request_count = self.request_count + 1
-            if self.request_count % 200 == 0:
+            if self.request_count % 50 == 0:
                 click.secho("Slow down... API needs to chill", fg="yellow")
                 for i in range(15, 0, -1):
                     print(f"sleeping {i}")
@@ -59,7 +60,7 @@ class SpotifyApi():
     def get_songs_genre_from_artist(self, liked_songs):
     
         if os.path.exists(f"{CACHE_PATH}/artist_info.json"):
-            with open("artist_info.json") as f_in:
+            with open(f"{CACHE_PATH}/artist_info.json") as f_in:
                 print("Reading artists cache...")
                 artist_cache = json.load(f_in)
         else:
@@ -97,15 +98,14 @@ class SpotifyApi():
         return liked_songs, None
 
     
-    def write_spotify_playlist(self, playlists: dict):
-    
+    def write_spotify_playlist(self, spotfy_id, playlists: dict):
         sorted_playlists = dict(sorted(playlists.items(), reverse=True))
 
         for playlist in sorted_playlists:
             # create genre
             print("creating new playlist: " + str(playlist) + " ...")
             #self.__check_count()
-            new_playlist = self.sp.user_playlist_create(self.user_name, str(playlist), public=False, description = playlists[playlist]["description"])
+            new_playlist = self.sp.user_playlist_create(spotfy_id, str(playlist), public=False, description = playlists[playlist]["description"])
             request_count =+ 1
 
             # save spotify playlist_id and update later user's playlists

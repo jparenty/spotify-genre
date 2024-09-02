@@ -1,12 +1,6 @@
 import click
 
 from utils.db import DbUtil
-#user_name = "Max Germano"
-#user_id = "1275902458"
-#user_name = "11170137944" # antoine
-#user_id = "hippolyte"
-user_name = "12165665581"
-
 
 @click.command()
 @click.option("-u",'--user_name')
@@ -16,7 +10,7 @@ def main(user_name, songs_number):
     #print current user information
     user = DbUtil(user_name=user_name)
     
-    
+    breakpoint()
 
     genres_liked_songs = user.get_liked_songs(songs_number)
 
@@ -24,8 +18,6 @@ def main(user_name, songs_number):
     playlists = user.generate_playlists(genres_liked_songs)
 
     playlists_stats = user.get_playlists_stats(playlists)
-
-    breakpoint()
     
     print("Filtering playlists ...")
     # filter playlists to keep only biggest playlists
@@ -33,10 +25,8 @@ def main(user_name, songs_number):
     #playlists_keep = playlists_stats.loc[playlists_stats["size"] > 3]
 
     #playlists_keep = playlists_stats["genre"].loc[0:79].to_list()
-    playlists_keep.append("israeli indie")
-    jazz_playlists = playlists_stats.loc[playlists_stats["genre"].str.contains("jazz")]["genre"].to_list()
-
-    playlists_keep = playlists_keep + jazz_playlists
+    extra_playlist = ["balkan post-punk", "metropopolis", "polish post-punk","hypnagogic pop","afrofuturism","deconstructed club","hyperpop","afropop","neue deutsche welle","neo-kraut","malian blues","croatian rock"]
+    playlists_keep = playlists_keep + extra_playlist
     #playlists_filtered = keep_popular_playlist(threshold)
 
     key_to_remove = set(playlists_stats["genre"].to_list()) - set(playlists_keep)
@@ -45,9 +35,10 @@ def main(user_name, songs_number):
     for key in list(key_to_remove):
         playlists.pop(key)
 
-
-    #recap(playlists)
+    click.secho("Ready to write playlists!", fg="green")
     breakpoint()
+    user.user_write_spotify_playlists(playlists)
+    #recap(playlists)
     return
 
 

@@ -5,24 +5,23 @@ import click
 
 from .spotify import SpotifyApi
 from .user import User
+from .definitions import CACHE_PATH
 # DB is local json files
-
-CACHE_PATH = "../../cache"
 
 class DbUtil(SpotifyApi):
 
     def __init__(self, user_name) -> None:
         #@click.command()
         def _get_user(user_name):
-            breakpoint()
             user = User.get_user(user_name)
 
             if user == None:
                 new_user = click.prompt(click.style("Unknown user, create user? (True/False)", fg='yellow'), type=bool)
-                breakpoint()
                 if new_user:
                     spotify_id = click.prompt(click.style("Enter spotify ID", fg='yellow'), type=str)
                     user = User(user_name=user_name, spotify_id=spotify_id)
+
+                    self.__cache_data(f"{self.user.user_name}/user.json", user)
                 else:
                     return Exception("Unknown user, exiting...")
 
@@ -33,19 +32,29 @@ class DbUtil(SpotifyApi):
 
     def __cache_data(self, path, data):
 
-            extension = path.split(".")[-1]
+        extension = path.split(".")[-1]
+        if extension == "json":
+            file = open(f"{CACHE_PATH}/{path}", "w")
+            file.write(json.dumps(data, indent=4))
+            file.close
+            return
+        elif extension == "csv":
+            data.to_csv(f"{CACHE_PATH}/{path}")
+            return
+        else:
+            return TypeError("Data type not supported by cache_data method")
+    
+    def _check_cache_exists(self, path):
+        if os.path.exists(f"{CACHE_PATH}/{path}"):
+            return True
+        else:
+            return False
+    
+    def _read_cache(self, path):
+        with open(f"{CACHE_PATH}/{path}") as f:
+            data = json.load(f)
+            return data
 
-            if extension == "json":
-                file = open(f"{CACHE_PATH}/{path}", "w")
-                file.write(json.dumps(data, indent=4))
-                file.close
-                return
-            elif extension == "csv":
-                data.to_csv(path)
-                return
-            else:
-                return TypeError("Data type not supported by cache_data method")
-            
     def __clean_songs(self, liked_songs):
         #liked_songs = liked_songs["items"]
 
@@ -89,7 +98,7 @@ class DbUtil(SpotifyApi):
                 click.secho("ERROR: genre playlist not in user's playlist", fg="red")
         
         # update db
-        self.__cache_data("playlists.json", playlists)
+        self.__cache_data(f"{self.user.user_name}/playlists.json", playlists)
 
     def __clean_playlists(self, playlists):
         print("Cleaning playlists...")
@@ -125,34 +134,33 @@ class DbUtil(SpotifyApi):
     def get_liked_songs(self, songs_number):
 
         # check if songs by genre cache exists
-        if os.path.exists("genre_clean_songs.json"):
+        if self._check_cache_exists(f"{self.user.user_name}/genre_clean_songs.json"):
             print("Reading cache genre songs...")
-            with open("genre_clean_songs.json") as f_in:
-                genre_liked_songs = json.load(f_in)    
+            genre_liked_songs = self._read_cache(f"{self.user.user_name}/genre_clean_songs.json") 
+
         else:
             #check if cache liked songs exists
-            if os.path.exists("clean_songs.json"):
+            if self._check_cache_exists(f"{self.user.user_name}/clean_songs.json"):
                 print("Reading cache liked songs...")
-                with open("clean_songs.json") as f_in:
-                    clean_liked_songs = json.load(f_in)    
-        
+                clean_liked_songs = self._read_cache(f"{self.user.user_name}/clean_songs.json") 
+
             else:
                 # fetch liked songs from spotify account with api
                 click.secho("No cache! Fetching recent liked songs...", fg="yellow")
-                liked_songs = self.connection.fetch_liked_songs(songs_number)
+                liked_songs = self.user.connection.fetch_liked_songs(songs_number)
                 
                 clean_liked_songs = self.__clean_songs(liked_songs)
                 click.secho("Caching data...", fg="green")
-                self.__cache_data("clean_songs.json", clean_liked_songs)
+                self.__cache_data(f"{self.user.user_name}/clean_songs.json", clean_liked_songs)
 
             #assign genres to song based on artists genre
-            genre_liked_songs, artist = self.connection.get_songs_genre_from_artist(clean_liked_songs)
+            genre_liked_songs, artist = self.user.connection.get_songs_genre_from_artist(clean_liked_songs)
             # cache_artist_data
             if artist:
-                self.__cache_data("artist_info.json", artist)
+                self.__cache_data("/artist_info.json", artist)
 
             # cache songs with genre information
-            self.__cache_data("genre_clean_songs.json", genre_liked_songs)
+            self.__cache_data(f"{self.user.user_name}/genre_clean_songs.json", genre_liked_songs)
 
 
         return genre_liked_songs
@@ -171,13 +179,13 @@ class DbUtil(SpotifyApi):
                 click.secho("ERROR: genre playlist not in user's playlist", fg="red")
         
         # update db
-        self.__cache_data("playlists.json", user_playlists)
+        self.__cache_data(f"{self.user.user_name}/playlists.json", user_playlists)
         return
 
     def generate_playlists(self, genres_data):
         print("Generating playlists by genre...")
         
-        if os.path.exists("playlists.json"):
+        if self._check_cache_exists("playlists.json"):
             print("Reading cache playlists...")
             with open("playlists.json") as f_in:
                 playlists = json.load(f_in)
@@ -204,7 +212,7 @@ class DbUtil(SpotifyApi):
 
         playlists = self.__clean_playlists(playlists)
 
-        self.__cache_data("playlists.json", playlists)
+        self.__cache_data(f"{self.user.user_name}/playlists.json", playlists)
 
         return playlists
 
@@ -220,25 +228,29 @@ class DbUtil(SpotifyApi):
         playlists_stats["size"] = playlist_size
 
         playlists_stats = playlists_stats.sort_values(by=["size"], ascending=False).reset_index(drop=True)
-
-        self.__cache_data("playlists_stats.csv", playlists_stats)
+        self.__cache_data(f"{self.user.user_name}/playlists_stats.csv", playlists_stats)
 
         return playlists_stats
 
     def user_write_spotify_playlists(self, playlists):
-        playlists = self.connection.write_spotify_playlist(playlists)
+        breakpoint()
+        self.user.connection.write_spotify_playlist(self.user.spotify_id, playlists)
         # update user playlists 
         #self.__update_user_add_playlists(playlists)
 
     def user_delete_all_playlists(self):
-        user_playlists = self.connection.update_user_delete_all_playlists()
+        user_playlists = self.user.connection.update_user_delete_all_playlists()
         # update user playlists 
-        self.__cache_data("playlists.json", user_playlists)
+        self.__cache_data(f"{self.user.user_name}/playlists.json", user_playlists)
 
 
+    def update_liked_songs(self):
+        last_song = self.user.get_last_song()
+        
+        
     ## anniv anne
     def get_playlist(self, playlist_id):        
-        playlist = self.connection.fetch_playlist(playlist_id)
+        playlist = self.user.connection.fetch_playlist(playlist_id)
 
         return playlist
     
