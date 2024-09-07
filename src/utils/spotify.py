@@ -10,7 +10,7 @@ from .definitions import CACHE_PATH
 
 class SpotifyApi():
     
-    def __init__(self, user_name) -> None:
+    def __init__(self, user_name, spotify_id) -> None:
         def auth_02(user_name):
             scope = 'user-library-read playlist-modify-private playlist-read-private playlist-modify-public'
             sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope, show_dialog = True, username=user_name))
@@ -20,9 +20,10 @@ class SpotifyApi():
         self.request_count = 0
         self.last_request = time.time()
         self.user_name = user_name
+        self.spotify_id = spotify_id
         self.sp = auth_02(self.user_name)
-        click.secho("Authentification successfull", fg="green")
         print(self.sp.current_user())
+        click.secho("Authentification successfull", fg="green")
 
     def __check_count(self):
         current_request = time.time()
@@ -45,7 +46,7 @@ class SpotifyApi():
     def fetch_liked_songs(self, songs_number):
 
         liked_songs = []
-        offset = 50
+        offset = 0
         for i in range(50, songs_number+50, 50):
             print(f"fetching sample {i}...")
             self.__check_count()
@@ -58,13 +59,16 @@ class SpotifyApi():
         return liked_songs
 
     def get_songs_genre_from_artist(self, liked_songs):
-    
+        ##!! cette class ne doit pas gérer les appeles à la db local
+
+        ##! à deplacer autre part -> avant que la méthode soit appelé, passer artist_cache
         if os.path.exists(f"{CACHE_PATH}/artist_info.json"):
             with open(f"{CACHE_PATH}/artist_info.json") as f_in:
                 print("Reading artists cache...")
                 artist_cache = json.load(f_in)
         else:
             artist_cache = {}
+        ##!
 
         update_cache = False
 
@@ -74,7 +78,7 @@ class SpotifyApi():
                 # check if artist exists in cache
                 if artist["id"] not in list(artist_cache.keys()):
                     # fetch arist info
-                    print("Fetch artist " + str(artist["name"] + "info..."))
+                    print(f"Fetch artist info '{artist['name']}' info for '{song['track_name']}'")
                     self.__check_count()
                     artist_info = self.sp.artist(artist["id"])
                     # update request count
@@ -85,7 +89,7 @@ class SpotifyApi():
 
                 else:
                     # read artist info from cache
-                    click.secho("Read artist" + str(artist["name"]) + " from cache...", fg="green")
+                    click.secho(f"Read artist info '{artist['name']}' info for '{song['track_name']}'", fg="green")
                     artist_info = artist_cache[artist["id"]]
                 
                 genres = genres.union(set(artist_info["genres"]))
@@ -94,10 +98,9 @@ class SpotifyApi():
         
         if update_cache:
             return liked_songs, artist_cache
-            
+        
         return liked_songs, None
 
-    
     def write_spotify_playlist(self, spotfy_id, playlists: dict):
         sorted_playlists = dict(sorted(playlists.items(), reverse=True))
 
@@ -149,6 +152,33 @@ class SpotifyApi():
 
         return playlist
     
+    def get_new_tracks(self, last_track):
+        new_tracks = []
+        offset = 0
+
+        click.secho("Fetching new tracks", fg="green")
+        while True:
+            click.secho(f"fetching sample {offset+50}...")
+
+            self.__check_count()
+            
+            sample = self.sp.current_user_saved_tracks(limit = 50, offset=offset)["items"]
+
+            # check if sample contains last tracks -> add sample until last track and break
+            sample_ids = [track["track"]["id"] for track in sample]
+            if last_track["track_id"] in sample_ids:
+                last_track_i = sample_ids.index(last_track["track_id"])
+                sample = sample[0:last_track_i]
+                
+                new_tracks.extend(sample)
+                break
+
+            new_tracks.extend(sample)
+            print(len(new_tracks))
+
+            offset =+ 50
+        return new_tracks
+            
     ## OLD
     # def delete_generated_playlist():
 

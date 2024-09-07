@@ -12,6 +12,9 @@ def main(user_name, songs_number):
     
     breakpoint()
 
+    user.update_liked_songs()
+    breakpoint()
+
     genres_liked_songs = user.get_liked_songs(songs_number)
 
     #create playlists based on genre

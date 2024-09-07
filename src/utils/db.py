@@ -21,7 +21,7 @@ class DbUtil(SpotifyApi):
                     spotify_id = click.prompt(click.style("Enter spotify ID", fg='yellow'), type=str)
                     user = User(user_name=user_name, spotify_id=spotify_id)
 
-                    self.__cache_data(f"{self.user.user_name}/user.json", user)
+                    self._cache_data(f"{self.user.user_name}/user.json", user)
                 else:
                     return Exception("Unknown user, exiting...")
 
@@ -30,7 +30,7 @@ class DbUtil(SpotifyApi):
         self.user = _get_user(user_name)
         
 
-    def __cache_data(self, path, data):
+    def _cache_data(self, path, data):
 
         extension = path.split(".")[-1]
         if extension == "json":
@@ -55,7 +55,7 @@ class DbUtil(SpotifyApi):
             data = json.load(f)
             return data
 
-    def __clean_songs(self, liked_songs):
+    def _clean_songs(self, liked_songs):
         #liked_songs = liked_songs["items"]
 
         # list of dicts containing song info
@@ -98,7 +98,7 @@ class DbUtil(SpotifyApi):
                 click.secho("ERROR: genre playlist not in user's playlist", fg="red")
         
         # update db
-        self.__cache_data(f"{self.user.user_name}/playlists.json", playlists)
+        self._cache_data(f"{self.user.user_name}/playlists.json", playlists)
 
     def __clean_playlists(self, playlists):
         print("Cleaning playlists...")
@@ -125,14 +125,16 @@ class DbUtil(SpotifyApi):
 
         return playlists
 
-    def read_cache(self, path):
-        with open(path) as f:
-            data = json.load(f)
+    def _get_songs_genre_from_artist(self, clean_liked_songs):
+        genre_liked_songs, artist = self.user.connection.get_songs_genre_from_artist(clean_liked_songs)
+        # cache_artist_data
+        if artist:
+            self._cache_data("/artist_info.json", artist)
 
-        return data
+        return genre_liked_songs
     
     def get_liked_songs(self, songs_number):
-
+        ##!! à revoir
         # check if songs by genre cache exists
         if self._check_cache_exists(f"{self.user.user_name}/genre_clean_songs.json"):
             print("Reading cache genre songs...")
@@ -149,18 +151,15 @@ class DbUtil(SpotifyApi):
                 click.secho("No cache! Fetching recent liked songs...", fg="yellow")
                 liked_songs = self.user.connection.fetch_liked_songs(songs_number)
                 
-                clean_liked_songs = self.__clean_songs(liked_songs)
+                clean_liked_songs = self._clean_songs(liked_songs)
                 click.secho("Caching data...", fg="green")
-                self.__cache_data(f"{self.user.user_name}/clean_songs.json", clean_liked_songs)
+                self._cache_data(f"{self.user.user_name}/clean_songs.json", clean_liked_songs)
 
             #assign genres to song based on artists genre
-            genre_liked_songs, artist = self.user.connection.get_songs_genre_from_artist(clean_liked_songs)
-            # cache_artist_data
-            if artist:
-                self.__cache_data("/artist_info.json", artist)
-
+            genre_liked_songs = self._get_songs_genre_from_artist(clean_liked_songs)
+ 
             # cache songs with genre information
-            self.__cache_data(f"{self.user.user_name}/genre_clean_songs.json", genre_liked_songs)
+            self._cache_data(f"{self.user.user_name}/genre_clean_songs.json", genre_liked_songs)
 
 
         return genre_liked_songs
@@ -179,7 +178,7 @@ class DbUtil(SpotifyApi):
                 click.secho("ERROR: genre playlist not in user's playlist", fg="red")
         
         # update db
-        self.__cache_data(f"{self.user.user_name}/playlists.json", user_playlists)
+        self._cache_data(f"{self.user.user_name}/playlists.json", user_playlists)
         return
 
     def generate_playlists(self, genres_data):
@@ -212,7 +211,7 @@ class DbUtil(SpotifyApi):
 
         playlists = self.__clean_playlists(playlists)
 
-        self.__cache_data(f"{self.user.user_name}/playlists.json", playlists)
+        self._cache_data(f"{self.user.user_name}/playlists.json", playlists)
 
         return playlists
 
@@ -228,12 +227,11 @@ class DbUtil(SpotifyApi):
         playlists_stats["size"] = playlist_size
 
         playlists_stats = playlists_stats.sort_values(by=["size"], ascending=False).reset_index(drop=True)
-        self.__cache_data(f"{self.user.user_name}/playlists_stats.csv", playlists_stats)
+        self._cache_data(f"{self.user.user_name}/playlists_stats.csv", playlists_stats)
 
         return playlists_stats
 
     def user_write_spotify_playlists(self, playlists):
-        breakpoint()
         self.user.connection.write_spotify_playlist(self.user.spotify_id, playlists)
         # update user playlists 
         #self.__update_user_add_playlists(playlists)
@@ -241,12 +239,32 @@ class DbUtil(SpotifyApi):
     def user_delete_all_playlists(self):
         user_playlists = self.user.connection.update_user_delete_all_playlists()
         # update user playlists 
-        self.__cache_data(f"{self.user.user_name}/playlists.json", user_playlists)
+        self._cache_data(f"{self.user.user_name}/playlists.json", user_playlists)
 
+    def _get_last_track(self):
+        user_tracks = self._read_cache(f"{self.user.user_name}/clean_songs.json")
+        
+        return user_tracks[0]
+
+    def _user_add_tracks(self, new_tracks):
+        user_tracks = self._read_cache(f"{self.user.user_name}/genre_clean_songs.json")
+        user_tracks.extend(new_tracks)
+    
+        self._cache_data(f"{self.user.user_name}/genre_clean_songs.json", user_tracks)
 
     def update_liked_songs(self):
-        last_song = self.user.get_last_song()
+        if self._check_cache_exists(f"{self.user.user_name}/genre_clean_songs.json"):
+            last_track = self._get_last_track()
+            new_tracks_raw = self.user.connection.get_new_tracks(last_track)
+            new_tracks_clean = self._clean_songs(new_tracks_raw)
+            new_tracks = self._get_songs_genre_from_artist(new_tracks_clean)
+            self._user_add_tracks(new_tracks)
+
+            click.secho(f"Liked tracks successfully updated for {self.user.user_name}", fg="green")
         
+        else:
+            click.secho(f"No saved songs to update for {self.user.user_name}", fg="red")
+            
         
     ## anniv anne
     def get_playlist(self, playlist_id):        
