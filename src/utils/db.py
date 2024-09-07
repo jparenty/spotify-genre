@@ -20,8 +20,7 @@ class DbUtil(SpotifyApi):
                 if new_user:
                     spotify_id = click.prompt(click.style("Enter spotify ID", fg='yellow'), type=str)
                     user = User(user_name=user_name, spotify_id=spotify_id)
-
-                    self._cache_data(f"{self.user.user_name}/user.json", user)
+                    self._cache_data(f"{user_name}/user.json", user.to_json())
                 else:
                     return Exception("Unknown user, exiting...")
 
@@ -272,6 +271,8 @@ class DbUtil(SpotifyApi):
 
         return playlist
     
+    def delete_user_playlist_old(self):
+        self.user.connection.delete_generated_playlist()
 
     def format_playlist(self, playlist):
 

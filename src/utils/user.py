@@ -9,7 +9,7 @@ class User:
 
     def __init__(self, user_name: str, spotify_id: str):
         self.user_name = user_name
-        self.spotify_id = spotify_id,
+        self.spotify_id = spotify_id
         self.connection = SpotifyApi(user_name=user_name, spotify_id=spotify_id)
 
     @staticmethod
@@ -21,11 +21,19 @@ class User:
                     user_name = user["user_name"],
                     spotify_id = user["spotify_id"]
                 )
-                user.spotify_id = user.spotify_id[0]
+                #! attention list pourquoi?
+                user.spotify_id = user.spotify_id
             
         except FileNotFoundError:
             user = None
         except Exception as e:
             return e
         
+        return user
+    
+    def to_json(self):
+        user = {
+            "user_name" : self.user_name,
+            "spotify_id" : self.spotify_id
+        }
         return user

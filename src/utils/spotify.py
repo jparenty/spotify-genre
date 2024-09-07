@@ -175,30 +175,30 @@ class SpotifyApi():
 
             new_tracks.extend(sample)
             print(len(new_tracks))
+            offset += 50
 
-            offset =+ 50
         return new_tracks
             
-    ## OLD
-    # def delete_generated_playlist():
+    # OLD
+    def delete_generated_playlist(self):
 
-    #     # get user's playlists
-    #     user_playlists = sp.user_playlists(user_name)["items"]
-    #     generated_playlists = []
+        # get user's playlists
+        user_playlists = self.sp.user_playlists(self.spotify_id)["items"]
+        generated_playlists = []
     
-    #     for playlist in user_playlists:
-    #         # spot generated playlist and get its id
-    #         playlist_description = playlist["description"]
-    #         if ":magic_jean:" in playlist_description:
-    #             print("Generated playlist spoted!")
-    #             generated_playlists.append(playlist["id"])
+        for playlist in user_playlists:
+            # spot generated playlist and get its id
+            playlist_description = playlist["description"]
+            if ":magic_jean:" in playlist_description:
+                print("Generated playlist spoted!")
+                generated_playlists.append(playlist["id"])
         
-    #     # delete generated playlist from user's account    
-    #     for delete_playlist in generated_playlists:
-    #         sp.current_user_unfollow_playlist(delete_playlist)
-    #         print("Generated playlist deleted!")
+        # delete generated playlist from user's account
+        for delete_playlist in generated_playlists:
+            self.sp.current_user_unfollow_playlist(delete_playlist)
+            print("Generated playlist deleted!")
 
-    #     return
+        return
 
 
 
