@@ -44,7 +44,7 @@ class SpotifyApi():
 
     
     def fetch_liked_songs(self, songs_number):
-
+        #! a revoir -> cette methode devrait seulement gerer l appel à l api
         liked_songs = []
         offset = 0
         for i in range(50, songs_number+50, 50):
@@ -59,8 +59,8 @@ class SpotifyApi():
         return liked_songs
 
     def get_tracks_genre_from_artist(self, liked_songs):
-        ##!! cette class ne doit pas gérer les appeles à la db local
-        # cette classe devrait juste gérer l appel pour choper genre artiste et c est tout
+        ##!! cette methode ne doit pas gérer les appeles à la db local
+        # cette methode devrait juste gérer l appel pour choper genre artiste et c est tout
         # deplacer le reste de la logique dans db/artists.py
     
         ##! à deplacer autre part -> avant que la méthode soit appelé, passer artist_cache
@@ -104,6 +104,8 @@ class SpotifyApi():
         return liked_songs, None
 
     def write_spotify_playlist(self, spotfy_id, playlists: dict):
+        #! a revoir, devrait seulment gerer l appel à l api
+        
         sorted_playlists = dict(sorted(playlists.items(), reverse=True))
 
         for playlist in sorted_playlists:
