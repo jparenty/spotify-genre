@@ -11,7 +11,7 @@ from .definitions import CACHE_PATH
 class SpotifyApi():
     
     def __init__(self, user_name, spotify_id) -> None:
-        def auth_02(user_name):
+        def _auth_02(user_name):
             scope = 'user-library-read playlist-modify-private playlist-read-private playlist-modify-public'
             sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope, show_dialog = True, username=user_name))
             return sp
@@ -21,7 +21,7 @@ class SpotifyApi():
         self.last_request = time.time()
         self.user_name = user_name
         self.spotify_id = spotify_id
-        self.sp = auth_02(self.user_name)
+        self.sp = _auth_02(self.user_name)
         print(self.sp.current_user())
         click.secho("Authentification successfull", fg="green")
 
@@ -58,9 +58,11 @@ class SpotifyApi():
 
         return liked_songs
 
-    def get_songs_genre_from_artist(self, liked_songs):
+    def get_tracks_genre_from_artist(self, liked_songs):
         ##!! cette class ne doit pas gérer les appeles à la db local
-
+        # cette classe devrait juste gérer l appel pour choper genre artiste et c est tout
+        # deplacer le reste de la logique dans db/artists.py
+    
         ##! à deplacer autre part -> avant que la méthode soit appelé, passer artist_cache
         if os.path.exists(f"{CACHE_PATH}/artist_info.json"):
             with open(f"{CACHE_PATH}/artist_info.json") as f_in:
