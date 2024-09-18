@@ -36,7 +36,7 @@ class SpotifyApi():
         
         else:
             self.request_count = self.request_count + 1
-            if self.request_count % 50 == 0:
+            if self.request_count % 75 == 0:
                 click.secho("Slow down... API needs to chill", fg="yellow")
                 for i in range(15, 0, -1):
                     print(f"sleeping {i}")
